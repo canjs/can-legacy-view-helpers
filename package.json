@@ -1,0 +1,79 @@
+{
+  "name": "can-legacy-view-helpers",
+  "version": "0.0.0",
+  "description": "Legacy view helpers used by can-ejs and can-mustache.",
+  "license": "MIT",
+  "homepage": "https://github.com/canjs/can-legacy-view-helpers",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/canjs/can-legacy-view-helpers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/canjs/can-legacy-view-helpers/issues"
+  },
+  "author": {
+    "name": "Bitovi",
+    "email": "justin@bitovi.com",
+    "url": "http://bitovi.com"
+  },
+  "scripts": {
+    "preversion": "npm test && npm run build",
+    "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/",
+    "postversion": "git push --tags && git checkout master && git branch -D release && git push",
+    "testee": "testee src/test/test.html --browsers firefox",
+    "test": "npm run jshint && npm run testee",
+    "jshint": "jshint src/. --config",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish",
+    "build": "node build.js",
+    "document": "documentjs",
+    "develop": "can-serve --static --develop --port 8080"
+  },
+  "main": "dist/cjs/can-legacy-view-helpers",
+  "browser": {
+    "transform": [
+      "cssify"
+    ]
+  },
+  "browserify": {
+    "transform": [
+      "cssify"
+    ]
+  },
+  "keywords": [
+    "CanJS",
+    "MVVM"
+  ],
+  "system": {
+    "main": "can-legacy-view-helpers",
+    "directories": {
+      "lib": "src/"
+    },
+    "configDependencies": [
+      "live-reload"
+    ],
+    "npmIgnore": [
+      "documentjs",
+      "testee",
+      "generator-donejs",
+      "donejs-cli",
+      "steal-tools"
+    ]
+  },
+  "dependencies": {
+    "can": "canjs/canjs#major",
+    "jquery": "~2.2.1"
+  },
+  "devDependencies": {
+    "documentjs": "^0.4.2",
+    "jshint": "^2.9.1",
+    "cssify": "^0.6.0",
+    "steal": "^0.14.0",
+    "steal-qunit": "^0.1.1",
+    "steal-tools": "^0.14.0",
+    "testee": "^0.2.4",
+    "generator-donejs": "^0.7.0",
+    "donejs-cli": "^0.7.0"
+  }
+}
