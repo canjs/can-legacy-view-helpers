@@ -1,6 +1,11 @@
-import can from "can/view/";
-import elements from "can/view/elements";
-import viewCallbacks from "can/view/callbacks/";
+/**
+ * This module must be CJS format because is uses `with () { ... }` 
+ * statements which will not work in ES6 since it forces strict mode.
+ */
+
+var can = require("can/view/");
+var elements = require("can/view/elements");
+var viewCallbacks = require("can/view/callbacks/");
 
 /**
  * Helper(s)
@@ -682,4 +687,4 @@ can.view.tag("content", function (el, tagData) {
 
 can.view.Scanner = Scanner;
 
-export default Scanner;
+module.exports = Scanner;
