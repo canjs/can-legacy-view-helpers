@@ -1,7 +1,7 @@
-import can from "can/view/";
-import elements from "can/view/elements";
-import live from "can/view/live/";
-import "can/util/string/";
+var can = require("../tmp/view");
+var elements = require("../tmp/elements");
+var live = require("can/view/live/");
+require("can-util/js/string/");
 
 /**
  * Helper(s)
@@ -65,7 +65,7 @@ var pendingHookups = [],
 
 var lastHookups;
 
-can.extend(can.view, {
+can.deepAssign(can.view, {
 	live: live,
 	// called in text to make a temporary 
 	// can.view.lists function that can be called with
@@ -257,4 +257,4 @@ can.extend(can.view, {
 	}
 });
 
-export default can;
+module.exports = can;

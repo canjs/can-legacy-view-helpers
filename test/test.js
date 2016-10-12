@@ -1,5 +1,7 @@
 import QUnit from 'steal-qunit';
-import { Scanner, can } from './can-legacy-view-helpers';
+import { Scanner, can } from '../can-legacy-view-helpers';
+
+console.log('LOADED');
 
 QUnit.module('can-legacy-view-helpers');
 

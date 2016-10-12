@@ -3,9 +3,9 @@
  * statements which will not work in ES6 since it forces strict mode.
  */
 
-var can = require("can/view/");
-var elements = require("can/view/elements");
-var viewCallbacks = require("can/view/callbacks/");
+var can = require("can-util");
+var elements = require("../tmp/elements");
+var viewCallbacks = require("../tmp/callbacks/");
 
 /**
  * Helper(s)
@@ -96,7 +96,7 @@ var newLine = /(\r|\n)+/g,
 
 can.view.Scanner = Scanner = function (options) {
 	// Set options on self
-	can.extend(this, {
+	can.deepAssign(this, {
 		/**
 		 * @typedef {{start: String, escape: String, scope: String, options: String}}  can.view.Scanner.text
 		 */

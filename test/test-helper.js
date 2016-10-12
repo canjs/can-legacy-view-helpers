@@ -34,7 +34,7 @@ can.test = {
 			return require.toUrl(path);
 		}
 
-		var pathIndex = window.location.href.indexOf('/test/')
+		var pathIndex = window.location.href.indexOf('/test/');
 		if(pathIndex){
 			return window.location.href.substring(0, pathIndex + 1) + path;
 		}
