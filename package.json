@@ -20,9 +20,9 @@
     "preversion": "npm test && npm run build",
     "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/",
     "postversion": "git push --tags && git checkout master && git branch -D release && git push",
-    "testee": "testee src/test/test.html --browsers firefox",
+    "testee": "testee test/test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
-    "jshint": "jshint src/. --config",
+    "jshint": "jshint src/. test/. --config",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
@@ -46,9 +46,10 @@
     "MVVM"
   ],
   "system": {
+    "npmAlgorithm": "flat",
     "main": "can-legacy-view-helpers",
-    "directories": {
-      "lib": "src/"
+    "paths": {
+      "jquery/jquery/index.js": "jquery/dist/jquery.min.js"
     },
     "configDependencies": [
       "live-reload"
@@ -62,7 +63,11 @@
     ]
   },
   "dependencies": {
-    "can": "canjs/canjs#major",
+    "can": "^3.0.0-pre.13",
+    "can-util": "^3.0.0-pre.68",
+    "can-compute": "^3.0.0-pre.17",
+    "can-view-live": "^3.0.0-pre.5",
+    "can-view-callbacks": "^3.0.0-pre.8",
     "jquery": "~2.2.1"
   },
   "devDependencies": {

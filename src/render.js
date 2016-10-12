@@ -1,7 +1,8 @@
-import can from "can/view/";
-import elements from "can/view/elements";
-import live from "can/view/live/";
-import "can/util/string/";
+var can = require("can-util");
+var canCompute = require("can-compute");
+var view = require("./view");
+var elements = require("./elements");
+var live = require("can-view-live");
 
 /**
  * Helper(s)
@@ -41,7 +42,7 @@ var pendingHookups = [],
 		// add it to pending hookups.
 		if (hook) {
 			if (tag) {
-				return "<" + tag + " " + can.view.hook(hook) + "></" + tag + ">";
+				return "<" + tag + " " + view.hook(hook) + "></" + tag + ">";
 			} else {
 				pendingHookups.push(hook);
 			}
@@ -65,18 +66,18 @@ var pendingHookups = [],
 
 var lastHookups;
 
-can.extend(can.view, {
+can.deepAssign(view, {
 	live: live,
 	// called in text to make a temporary 
-	// can.view.lists function that can be called with
+	// view.lists function that can be called with
 	// the list to iterate over and the template
 	// used to produce the content within the list
 	setupLists: function () {
 
-		var old = can.view.lists,
+		var old = view.lists,
 			data;
 
-		can.view.lists = function (list, renderer) {
+		view.lists = function (list, renderer) {
 			data = {
 				list: list,
 				renderer: renderer
@@ -85,7 +86,7 @@ can.extend(can.view, {
 		};
 		// sets back to the old data
 		return function () {
-			can.view.lists = old;
+			view.lists = old;
 			return data;
 		};
 	},
@@ -99,7 +100,7 @@ can.extend(can.view, {
 		return contentEscape(func.call(self));
 	},
 	/**
-	 * @function can.view.txt
+	 * @function view.txt
 	 * @hide
 	 *
 	 * A helper function used to insert the
@@ -107,7 +108,7 @@ can.extend(can.view, {
 	 * a template's output. It detects if an observable value is
 	 * read and will setup live binding.
 	 *
-	 * @signature `can.view.txt(escape, tagName, status, self, func)`
+	 * @signature `view.txt(escape, tagName, status, self, func)`
 	 *
 	 * @param {Number} 1 if the content returned should be escaped, 0 if otherwise.
 	 * @param {String} tagName the name of the tag the magic tag is most immediately
@@ -153,9 +154,9 @@ can.extend(can.view, {
 				withinTemplatedSectionWithinAnElement = true;
 			}
 
-			// Sets up a listener so we know any can.view.lists called 
+			// Sets up a listener so we know any view.lists called 
 			// when func is called
-			var listTeardown = can.view.setupLists();
+			var listTeardown = view.setupLists();
 			// 
 			unbind = function () {
 				compute.unbind("change", emptyHandler);
@@ -167,7 +168,7 @@ can.extend(can.view, {
 			//     {{#if items.length}}{{#items}}{{.}}{{/items}}{{/if}}
 			// We do not want `{{#if items.length}}` changing the DOM if
 			// `{{#items}}` text changes.
-			compute = can.compute(func, self, false);
+			compute = canCompute(func, self, false);
 
 			// Bind to get and temporarily cache the value of the compute.
 			compute.bind("change", emptyHandler);
@@ -187,7 +188,7 @@ can.extend(can.view, {
 
 		if (listData) {
 			unbind();
-			return "<" + tag + can.view.hook(function (el, parentNode) {
+			return "<" + tag + view.hook(function (el, parentNode) {
 				live.list(el, listData.list, listData.renderer, self, parentNode);
 			}) + "></" + tag + ">";
 		}
@@ -208,7 +209,7 @@ can.extend(can.view, {
 		if (status === 0 && !contentProp) {
 			var selfClosing = !!elements.selfClosingTags[tag];
 			// Return an element tag with a hookup in place of the content
-			return "<" + tag + can.view.hook(
+			return "<" + tag + view.hook(
 				// if value is an object, it's likely something returned by .safeString
 				escape && typeof value !== "object" ?
 				// If we are escaping, replace the parentNode with 
@@ -257,4 +258,4 @@ can.extend(can.view, {
 	}
 });
 
-export default can;
+module.exports = can;

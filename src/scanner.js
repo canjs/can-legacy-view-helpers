@@ -3,9 +3,10 @@
  * statements which will not work in ES6 since it forces strict mode.
  */
 
-var can = require("can/view/");
-var elements = require("can/view/elements");
-var viewCallbacks = require("can/view/callbacks/");
+var can = require("can-util");
+var view = require("./view");
+var elements = require("./elements");
+var viewCallbacks = require("can-view-callbacks");
 
 /**
  * Helper(s)
@@ -82,23 +83,23 @@ var newLine = /(\r|\n)+/g,
 	Scanner;
 
 /**
- * @constructor can.view.Scanner
+ * @constructor view.Scanner
  *
- * can.view.Scanner is used to convert a template into a JavaScript function.  That
+ * view.Scanner is used to convert a template into a JavaScript function.  That
  * function is called to produce a rendered result as a string. Often
  * the rendered result will include data-view-id attributes on elements that
  * will be processed after the template is used to create a document fragment.
  *
  *
- * @param {{text: can.view.Scanner.text, tokens: Array<can.view.Scanner.token>, helpers: Array<can.view.Scanner.helpers>}}
+ * @param {{text: view.Scanner.text, tokens: Array<view.Scanner.token>, helpers: Array<view.Scanner.helpers>}}
  */
 //
 
-can.view.Scanner = Scanner = function (options) {
+view.Scanner = Scanner = function (options) {
 	// Set options on self
-	can.extend(this, {
+	can.deepAssign(this, {
 		/**
-		 * @typedef {{start: String, escape: String, scope: String, options: String}}  can.view.Scanner.text
+		 * @typedef {{start: String, escape: String, scope: String, options: String}}  view.Scanner.text
 		 */
 		text: {},
 		tokens: []
@@ -157,7 +158,7 @@ can.view.Scanner = Scanner = function (options) {
 };
 
 /**
- * Extend can.View to add scanner support.
+ * Extend view to add scanner support.
  */
 Scanner.prototype = {
 	// a default that can be overwritten
@@ -332,7 +333,7 @@ Scanner.prototype = {
 						// Put the start of the end
 						buff.push(put_cmd,
 							'"', clean(content), '"',
-							",can.view.pending({tagName:'" + tagName + "'," + (attrs) + "scope: " + (this.text.scope || "this") + this.text.options);
+							",view.pending({tagName:'" + tagName + "'," + (attrs) + "scope: " + (this.text.scope || "this") + this.text.options);
 
 						// if it's a self closing tag (like <content/>) close and end the tag
 						if (emptyElement) {
@@ -353,7 +354,7 @@ Scanner.prototype = {
 
 					} else if (magicInTag || (!popTagName && elements.tagToContentPropMap[tagNames[tagNames.length - 1]]) || attrs) {
 						// make sure / of /> is on the right of pending
-						var pendingPart = ",can.view.pending({" + attrs + "scope: " + (this.text.scope || "this") + this.text.options + "}),\"";
+						var pendingPart = ",view.pending({" + attrs + "scope: " + (this.text.scope || "this") + this.text.options + "}),\"";
 						if (emptyElement) {
 							put(content.substr(0, content.length - 1), pendingPart + "/>\"");
 						} else {
@@ -414,7 +415,7 @@ Scanner.prototype = {
 
 								specialAttribute = true;
 
-								buff.push(insert_cmd, "can.view.txt(2,'" + getTag(tagName, tokens, i) + "'," + _status() + ",this,function(){", startTxt);
+								buff.push(insert_cmd, "view.txt(2,'" + getTag(tagName, tokens, i) + "'," + _status() + ",this,function(){", startTxt);
 								put(attrName + "=" + token);
 								break;
 							}
@@ -496,7 +497,7 @@ Scanner.prototype = {
 						// We are ending a block.
 						if (bracketCount === 1) {
 							// We are starting on. 
-							buff.push(insert_cmd, 'can.view.txt(0,\'' + getTag(tagName, tokens, i) + '\',' + _status() + ',this,function(){', startTxt, content);
+							buff.push(insert_cmd, 'view.txt(0,\'' + getTag(tagName, tokens, i) + '\',' + _status() + ',this,function(){', startTxt, content);
 							endStack.push({
 								before: "",
 								after: finishTxt + "}));\n"
@@ -562,15 +563,15 @@ Scanner.prototype = {
 						if (typeof content === 'object') {
 
 							if (content.startTxt && content.end && specialAttribute) {
-								buff.push(insert_cmd, "can.view.toStr( ",content.content, '() ) );');
+								buff.push(insert_cmd, "view.toStr( ",content.content, '() ) );');
 
 							} else {
 
 								if (content.startTxt) {
-									buff.push(insert_cmd, "can.view.txt(\n" +
+									buff.push(insert_cmd, "view.txt(\n" +
 										(typeof _status() === "string" || (content.escaped != null ? content.escaped : escaped)) + ",\n'" + tagName + "',\n" + _status() + ",\nthis,\n");
 								} else if (content.startOnlyTxt) {
-									buff.push(insert_cmd, 'can.view.onlytxt(this,\n');
+									buff.push(insert_cmd, 'view.onlytxt(this,\n');
 								}
 								buff.push(content.content);
 								if (content.end) {
@@ -587,7 +588,7 @@ Scanner.prototype = {
 							// If we have `<%== a(function(){ %>` then we want
 							// `can.EJS.text(0,this, function(){ return a(function(){ var _v1ew = [];`.
 
-							buff.push(insert_cmd, "can.view.txt(\n" + (typeof _status() === "string" || escaped) +
+							buff.push(insert_cmd, "view.txt(\n" + (typeof _status() === "string" || escaped) +
 								",\n'" + tagName + "',\n" + _status() + ",\nthis,\nfunction(){ " +
 								(this.text.escape || '') +
 								"return ", content,
@@ -599,7 +600,7 @@ Scanner.prototype = {
 								"}));\n"
 							);
 
-							/*buff.push(insert_cmd, "can.view.txt(\n" +
+							/*buff.push(insert_cmd, "view.txt(\n" +
 								  + ",\n'" +
 								  tagName + "',\n" +
 								  _status() +",\n" +
@@ -652,15 +653,15 @@ Scanner.prototype = {
 	}
 };
 
-// can.view.attr
+// view.attr
 
 // This is called when there is a special tag
-can.view.pending = function (viewData) {
+view.pending = function (viewData) {
 	// we need to call any live hookups
 	// so get that and return the hook
 	// a better system will always be called with the same stuff
-	var hooks = can.view.getHooks();
-	return can.view.hook(function (el) {
+	var hooks = view.getHooks();
+	return view.hook(function (el) {
 		can.each(hooks, function (fn) {
 			fn(el);
 		});
@@ -681,10 +682,10 @@ can.view.pending = function (viewData) {
 
 };
 
-can.view.tag("content", function (el, tagData) {
+viewCallbacks.tag("content", function (el, tagData) {
 	return tagData.scope;
 });
 
-can.view.Scanner = Scanner;
+view.Scanner = Scanner;
 
 module.exports = Scanner;
