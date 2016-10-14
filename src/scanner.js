@@ -1,12 +1,13 @@
 /**
- * This module must be CJS format because is uses `with () { ... }` 
+ * This module must be CJS format because is uses `with () { ... }`
  * statements which will not work in ES6 since it forces strict mode.
  */
 
-var can = require("can-util");
-var elements = require("../tmp/elements");
-var viewCallbacks = require("../tmp/callbacks/");
-
+var elements = require("./elements");
+var viewCallbacks = require("can-view-callbacks");
+var deepAssign = require("can-util/js/deep-assign/deep-assign");
+var view = require("./view");
+var each = require("can-util/js/each/each");
 /**
  * Helper(s)
  */
@@ -94,9 +95,9 @@ var newLine = /(\r|\n)+/g,
  */
 //
 
-can.view.Scanner = Scanner = function (options) {
+var Scanner = function (options) {
 	// Set options on self
-	can.deepAssign(this, {
+	deepAssign(this, {
 		/**
 		 * @typedef {{start: String, escape: String, scope: String, options: String}}  can.view.Scanner.text
 		 */
@@ -332,7 +333,7 @@ Scanner.prototype = {
 						// Put the start of the end
 						buff.push(put_cmd,
 							'"', clean(content), '"',
-							",can.view.pending({tagName:'" + tagName + "'," + (attrs) + "scope: " + (this.text.scope || "this") + this.text.options);
+							",CAN_LEGACY_HELPERS.view.pending({tagName:'" + tagName + "'," + (attrs) + "scope: " + (this.text.scope || "this") + this.text.options);
 
 						// if it's a self closing tag (like <content/>) close and end the tag
 						if (emptyElement) {
@@ -340,7 +341,7 @@ Scanner.prototype = {
 							content = "/>";
 							popTagHookup();
 						}
-						// if it's an empty tag	 
+						// if it's an empty tag
 						else if (tokens[i] === "<" && tokens[i + 1] === "/" + tagName) {
 							buff.push("}));");
 							content = token;
@@ -353,7 +354,7 @@ Scanner.prototype = {
 
 					} else if (magicInTag || (!popTagName && elements.tagToContentPropMap[tagNames[tagNames.length - 1]]) || attrs) {
 						// make sure / of /> is on the right of pending
-						var pendingPart = ",can.view.pending({" + attrs + "scope: " + (this.text.scope || "this") + this.text.options + "}),\"";
+						var pendingPart = ",CAN_LEGACY_HELPERS.view.pending({" + attrs + "scope: " + (this.text.scope || "this") + this.text.options + "}),\"";
 						if (emptyElement) {
 							put(content.substr(0, content.length - 1), pendingPart + "/>\"");
 						} else {
@@ -414,7 +415,7 @@ Scanner.prototype = {
 
 								specialAttribute = true;
 
-								buff.push(insert_cmd, "can.view.txt(2,'" + getTag(tagName, tokens, i) + "'," + _status() + ",this,function(){", startTxt);
+								buff.push(insert_cmd, "CAN_LEGACY_HELPERS.view.txt(2,'" + getTag(tagName, tokens, i) + "'," + _status() + ",this,function(){", startTxt);
 								put(attrName + "=" + token);
 								break;
 							}
@@ -495,8 +496,8 @@ Scanner.prototype = {
 
 						// We are ending a block.
 						if (bracketCount === 1) {
-							// We are starting on. 
-							buff.push(insert_cmd, 'can.view.txt(0,\'' + getTag(tagName, tokens, i) + '\',' + _status() + ',this,function(){', startTxt, content);
+							// We are starting on.
+							buff.push(insert_cmd, 'CAN_LEGACY_HELPERS.view.txt(0,\'' + getTag(tagName, tokens, i) + '\',' + _status() + ',this,function(){', startTxt, content);
 							endStack.push({
 								before: "",
 								after: finishTxt + "}));\n"
@@ -562,15 +563,15 @@ Scanner.prototype = {
 						if (typeof content === 'object') {
 
 							if (content.startTxt && content.end && specialAttribute) {
-								buff.push(insert_cmd, "can.view.toStr( ",content.content, '() ) );');
+								buff.push(insert_cmd, "CAN_LEGACY_HELPERS.view.toStr( ",content.content, '() ) );');
 
 							} else {
 
 								if (content.startTxt) {
-									buff.push(insert_cmd, "can.view.txt(\n" +
+									buff.push(insert_cmd, "CAN_LEGACY_HELPERS.view.txt(\n" +
 										(typeof _status() === "string" || (content.escaped != null ? content.escaped : escaped)) + ",\n'" + tagName + "',\n" + _status() + ",\nthis,\n");
 								} else if (content.startOnlyTxt) {
-									buff.push(insert_cmd, 'can.view.onlytxt(this,\n');
+									buff.push(insert_cmd, 'CAN_LEGACY_HELPERS.view.onlytxt(this,\n');
 								}
 								buff.push(content.content);
 								if (content.end) {
@@ -585,9 +586,9 @@ Scanner.prototype = {
 
 						} else {
 							// If we have `<%== a(function(){ %>` then we want
-							// `can.EJS.text(0,this, function(){ return a(function(){ var _v1ew = [];`.
+							// `CAN_LEGACY_HELPERS.EJS.text(0,this, function(){ return a(function(){ var _v1ew = [];`.
 
-							buff.push(insert_cmd, "can.view.txt(\n" + (typeof _status() === "string" || escaped) +
+							buff.push(insert_cmd, "CAN_LEGACY_HELPERS.view.txt(\n" + (typeof _status() === "string" || escaped) +
 								",\n'" + tagName + "',\n" + _status() + ",\nthis,\nfunction(){ " +
 								(this.text.escape || '') +
 								"return ", content,
@@ -655,13 +656,13 @@ Scanner.prototype = {
 // can.view.attr
 
 // This is called when there is a special tag
-can.view.pending = function (viewData) {
+view.pending = function (viewData) {
 	// we need to call any live hookups
 	// so get that and return the hook
 	// a better system will always be called with the same stuff
-	var hooks = can.view.getHooks();
-	return can.view.hook(function (el) {
-		can.each(hooks, function (fn) {
+	var hooks = view.getHooks();
+	return view.hook(function (el) {
+		each(hooks, function (fn) {
 			fn(el);
 		});
 		viewData.templateType = "legacy";
@@ -669,7 +670,7 @@ can.view.pending = function (viewData) {
 			viewCallbacks.tagHandler(el, viewData.tagName, viewData);
 		}
 
-		can.each(viewData && viewData.attrs || [], function (attributeName) {
+		each(viewData && viewData.attrs || [], function (attributeName) {
 			viewData.attributeName = attributeName;
 			var callback = viewCallbacks.attr(attributeName);
 			if(callback) {
@@ -681,10 +682,7 @@ can.view.pending = function (viewData) {
 
 };
 
-can.view.tag("content", function (el, tagData) {
-	return tagData.scope;
-});
 
-can.view.Scanner = Scanner;
+view.Scanner = Scanner;
 
 module.exports = Scanner;

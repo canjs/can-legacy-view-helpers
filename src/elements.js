@@ -1,11 +1,8 @@
-var can = require('can-util');
-var $ = require('jquery/dist/jquery.min.js');
+var nodeLists = require("./node_list");
 
 var doc = typeof document !== "undefined" ? document: null;
 
-var selectsCommentNodes = doc && (function(){
-	return $(document.createComment('~')).length === 1;
-})();
+
 
 /**
  * @property {Object} can.view.elements
@@ -39,13 +36,6 @@ var elements = {
 	 * If the attribute name is not found, it's assumed to use
 	 * `element.getAttribute` and `element.setAttribute`.
 	 */
-	// 3.0 TODO: remove
-	attrMap: can.attr.map,
-	// matches the attrName of a regexp
-	attrReg: /([^\s=]+)[\s]*=[\s]*/,
-	// 3.0 TODO: remove
-	defaultValue: can.attr.defaultValue,
-	// a map of parent element to child elements
 	/**
 	 * @property {Object.<String,String>} can.view.elements.tagMap
 	 * @parent can.view.elements
@@ -86,12 +76,6 @@ var elements = {
 	getParentNode: function (el, defaultParentNode) {
 		return defaultParentNode && el.parentNode.nodeType === 11 ? defaultParentNode : el.parentNode;
 	},
-	// 3.0 TODO: remove
-	setAttr: can.attr.set,
-	// 3.0 TODO: remove
-	getAttr: can.attr.get,
-	// 3.0 TODO: remove
-	removeAttr: can.attr.remove,
 	// Gets a "pretty" value for something
 	contentText: function (text) {
 		if (typeof text === 'string') {
@@ -103,59 +87,9 @@ var elements = {
 		}
 		return '' + text;
 	},
-	/**
-	 * @function can.view.elements.after
-	 * @parent can.view.elements
-	 *
-	 * Inserts newFrag after oldElements.
-	 *
-	 * @param {Array.<HTMLElement>} oldElements
-	 * @param {DocumentFragment} newFrag
-	 */
-	after: function (oldElements, newFrag) {
-		var last = oldElements[oldElements.length - 1];
-		// Insert it in the `document` or `documentFragment`
-		if (last.nextSibling) {
-			can.insertBefore(last.parentNode, newFrag, last.nextSibling, can.document);
-		} else {
-			can.appendChild(last.parentNode, newFrag, can.document);
-		}
-	},
-	/**
-	 * @function can.view.elements.replace
-	 * @parent can.view.elements
-	 *
-	 * Replaces `oldElements` with `newFrag`
-	 *
-	 * @param {Array.<HTMLElement>} oldElements
-	 * @param {DocumentFragment} newFrag
-	 */
-	replace: function (oldElements, newFrag) {
-		// The following helps make sure that a selected <option> remains
-		// the same by removing `selected` from the currently selected option
-		// and adding selected to an option that has the same value.
-		var selectedValue,
-			parentNode = oldElements[0].parentNode;
-			
-		if(parentNode.nodeName.toUpperCase() === "SELECT" && parentNode.selectedIndex >= 0) {
-			selectedValue = parentNode.value;
-		}
-		
-		
-		elements.after(oldElements, newFrag);
-		if(can.remove($(oldElements)).length < oldElements.length && !selectsCommentNodes) {
-			can.each(oldElements, function(el) {
-				if(el.nodeType === 8) {
-					el.parentNode.removeChild(el);
-				}
-			});
-		}
-		if(selectedValue !== undefined) {
-			parentNode.value = selectedValue;
-		}
-	}
-};
 
-can.view.elements = elements;
+	after: nodeLists.after,
+	replace: nodeLists.replace
+};
 
 module.exports = elements;

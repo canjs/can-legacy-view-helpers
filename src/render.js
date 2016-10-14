@@ -1,8 +1,9 @@
-var can = require("../tmp/view");
-var elements = require("../tmp/elements");
-var live = require("can/view/live/");
-require("can-util/js/string/");
-
+var view = require("./view");
+var elements = require("./elements");
+var string = require("can-util/js/string/string");
+var deepAssign = require("can-util/js/deep-assign/deep-assign");
+var canCompute = require("can-compute");
+var live = require("./live");
 /**
  * Helper(s)
  */
@@ -41,7 +42,7 @@ var pendingHookups = [],
 		// add it to pending hookups.
 		if (hook) {
 			if (tag) {
-				return "<" + tag + " " + can.view.hook(hook) + "></" + tag + ">";
+				return "<" + tag + " " + view.hook(hook) + "></" + tag + ">";
 			} else {
 				pendingHookups.push(hook);
 			}
@@ -55,7 +56,7 @@ var pendingHookups = [],
 	// Returns escaped/sanatized content for anything other than a live-binding
 	contentEscape = function (txt, tag) {
 		return (typeof txt === 'string' || typeof txt === 'number') ?
-			can.esc(txt) :
+			string.esc(txt) :
 			contentText(txt, tag);
 	},
 	// A flag to indicate if .txt was called within a live section within an element like the {{name}}
@@ -65,18 +66,19 @@ var pendingHookups = [],
 
 var lastHookups;
 
-can.deepAssign(can.view, {
+deepAssign(view, {
+	contentText: contentText,
 	live: live,
-	// called in text to make a temporary 
+	// called in text to make a temporary
 	// can.view.lists function that can be called with
 	// the list to iterate over and the template
 	// used to produce the content within the list
 	setupLists: function () {
 
-		var old = can.view.lists,
+		var old = view.lists,
 			data;
 
-		can.view.lists = function (list, renderer) {
+		view.lists = function (list, renderer) {
 			data = {
 				list: list,
 				renderer: renderer
@@ -85,7 +87,7 @@ can.deepAssign(can.view, {
 		};
 		// sets back to the old data
 		return function () {
-			can.view.lists = old;
+			view.lists = old;
 			return data;
 		};
 	},
@@ -153,21 +155,21 @@ can.deepAssign(can.view, {
 				withinTemplatedSectionWithinAnElement = true;
 			}
 
-			// Sets up a listener so we know any can.view.lists called 
+			// Sets up a listener so we know any can.view.lists called
 			// when func is called
-			var listTeardown = can.view.setupLists();
-			// 
+			var listTeardown = view.setupLists();
+			//
 			unbind = function () {
 				compute.unbind("change", emptyHandler);
 			};
 			// Create a compute that calls func and looks for dependencies.
-			// By passing `false`, this compute can not be a dependency of other 
-			// computes.  This is because live-bits are nested, but 
+			// By passing `false`, this compute can not be a dependency of other
+			// computes.  This is because live-bits are nested, but
 			// handle their own updating. For example:
 			//     {{#if items.length}}{{#items}}{{.}}{{/items}}{{/if}}
 			// We do not want `{{#if items.length}}` changing the DOM if
 			// `{{#items}}` text changes.
-			compute = can.compute(func, self, false);
+			compute = canCompute(func, self, false);
 
 			// Bind to get and temporarily cache the value of the compute.
 			compute.bind("change", emptyHandler);
@@ -187,7 +189,7 @@ can.deepAssign(can.view, {
 
 		if (listData) {
 			unbind();
-			return "<" + tag + can.view.hook(function (el, parentNode) {
+			return "<" + tag + view.hook(function (el, parentNode) {
 				live.list(el, listData.list, listData.renderer, self, parentNode);
 			}) + "></" + tag + ">";
 		}
@@ -208,10 +210,10 @@ can.deepAssign(can.view, {
 		if (status === 0 && !contentProp) {
 			var selfClosing = !!elements.selfClosingTags[tag];
 			// Return an element tag with a hookup in place of the content
-			return "<" + tag + can.view.hook(
+			return "<" + tag + view.hook(
 				// if value is an object, it's likely something returned by .safeString
 				escape && typeof value !== "object" ?
-				// If we are escaping, replace the parentNode with 
+				// If we are escaping, replace the parentNode with
 				// a text node who's value is `func`'s return value.
 				function (el, parentNode) {
 					live.text(el, compute, parentNode);
@@ -257,4 +259,4 @@ can.deepAssign(can.view, {
 	}
 });
 
-module.exports = can;
+module.exports = view;
