@@ -1,6 +1,6 @@
 {
   "name": "can-legacy-view-helpers",
-  "version": "0.2.0",
+  "version": "0.2.0-0",
   "description": "Legacy view helpers used by can-ejs and can-mustache.",
   "license": "MIT",
   "homepage": "https://github.com/canjs/can-legacy-view-helpers",
@@ -23,7 +23,7 @@
     "testee": "testee test/test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
     "jshint": "jshint src/. --config",
-	"release:pre": "npm version pre && npm publish",
+    "release:pre": "npm version pre && npm publish",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
