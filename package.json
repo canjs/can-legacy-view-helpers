@@ -18,8 +18,6 @@
   },
   "scripts": {
     "preversion": "npm test",
-    "version": "git commit -am \"Update dist for release\" && git checkout -b release",
-    "postversion": "git push --tags && git checkout master && git branch -D release && git push",
     "testee": "testee test/test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
     "jshint": "jshint src/. --config",
