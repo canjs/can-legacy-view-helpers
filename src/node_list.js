@@ -1,4 +1,3 @@
-var elements = require("./elements");
 var makeArray = require("can-util/js/make-array/make-array");
 var CID = require("can-util/js/cid/cid");
 var each = require("can-util/js/each/each");
@@ -9,7 +8,7 @@ var domMutate = require("can-util/dom/mutate/mutate");
 	// We use this boolean to determine how we are going to hold on
 	// to HTMLTextNode within a nodeList.  More about this in the 'id'
 	// function.
-	var canExpando = true;
+	var canExpando = true, readId, nodeLists;
 	try {
 		document.createTextNode('')._ = 0;
 	} catch (ex) {
@@ -64,21 +63,21 @@ var domMutate = require("can-util/dom/mutate/mutate");
 					return 'text_' + _id;
 				}
 			}
-		},
-		readId = function(node,textNodeMap){
-			if (canExpando || node.nodeType !== 3) {
-				return node[expando];
-			} else {
-				// The nodeList has a specific collection for HTMLTextNodes for
-				// (older) browsers that do not support expando properties.
-				for (var textNodeID in textNodeMap) {
-					if (textNodeMap[textNodeID] === node) {
-						return textNodeID;
-					}
+		};
+	readId = function(node,textNodeMap){
+		if (canExpando || node.nodeType !== 3) {
+			return node[expando];
+		} else {
+			// The nodeList has a specific collection for HTMLTextNodes for
+			// (older) browsers that do not support expando properties.
+			for (var textNodeID in textNodeMap) {
+				if (textNodeMap[textNodeID] === node) {
+					return textNodeID;
 				}
 			}
-		},
-		splice = [].splice,
+		}
+	};
+	var splice = [].splice,
 		push = [].push,
 
 		// ## nodeLists.itemsInChildListTree
@@ -162,7 +161,7 @@ var domMutate = require("can-util/dom/mutate/mutate");
 	// When you regsiter a nodeList, you can also provide a callback to know when
 	// that nodeList has been replaced by a parent nodeList.  This is
 	// useful for tearing down live-binding.
-	var nodeLists = {
+	nodeLists = {
 		id: id,
 
 		// ## nodeLists.update

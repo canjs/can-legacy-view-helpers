@@ -529,17 +529,18 @@ var getValue = function (val) {
 		text: function (el, compute, parentNode, nodeList) {
 			var parent = elements.getParentNode(el, parentNode),
 				node;
+
 			// setup listening right away so we don't have to re-calculate value
 			var data = listen(parent, compute, function (ev, newVal) {
 				// Sometimes this is 'unknown' in IE and will throw an exception if it is
-				/* jshint ignore:start */
+
 				if (typeof node.nodeValue !== 'unknown') {
 					node.nodeValue = view.toStr(newVal);
 				}
-				/* jshint ignore:end */
-				// TODO: remove in 2.1
+
 				data.teardownCheck(node.parentNode);
 			});
+			/* jshint ignore: end */
 			// The text node that will be updated
 
 			node = el.ownerDocument.createTextNode(view.toStr(compute()));
@@ -595,6 +596,7 @@ var getValue = function (val) {
 		attributePlaceholder: '__!!__',
 		attributeReplace: /__!!__/g,
 		attribute: function (el, attributeName, compute) {
+			var hook;
 			listen(el, compute, function () {
 				domAttr.set(el, attributeName, hook.render());
 			});
@@ -616,8 +618,8 @@ var getValue = function (val) {
 				// Only split out the first __!!__ so if we have multiple hookups in the same attribute,
 				// they will be put in the right spot on first render
 				parts = attr.split(live.attributePlaceholder),
-				goodParts = [],
-				hook;
+				goodParts = [];
+
 			goodParts.push(parts.shift(), parts.join(live.attributePlaceholder));
 			// If we already had a hookup for this attribute...
 			if (hooks[attributeName]) {

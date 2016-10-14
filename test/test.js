@@ -1,16 +1,14 @@
-import QUnit from 'steal-qunit';
-import { Scanner, can } from '../can-legacy-view-helpers';
+var QUnit = require("steal-qunit");
+var legacyViewHelpers = require("can-legacy-view-helpers");
 
-console.log('LOADED');
 
 QUnit.module('can-legacy-view-helpers');
 
-QUnit.test('Plugin initialized', function () {
-  QUnit.ok(typeof Scanner !== "undefined");
-});
-
-QUnit.test('Render helpers registered successfully.', function () {
-  QUnit.ok(typeof can.view.txt === "function");
-  QUnit.ok(typeof can.view.onlytxt === "function");
-  QUnit.ok(typeof can.view.setupLists === "function");
+QUnit.test('Exports things', function () {
+  QUnit.ok(legacyViewHelpers.view, "view");
+  QUnit.ok(legacyViewHelpers.elements, "elements");
+  QUnit.ok(legacyViewHelpers.live, "live");
+  QUnit.ok(legacyViewHelpers.nodeLists, "nodeLists");
+  QUnit.ok(legacyViewHelpers.render, "render");
+  QUnit.ok(legacyViewHelpers.Scanner, "Scanner");
 });
