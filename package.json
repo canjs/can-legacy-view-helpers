@@ -20,9 +20,9 @@
     "preversion": "npm test && npm run build",
     "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/",
     "postversion": "git push --tags && git checkout master && git branch -D release && git push",
-    "testee": "testee src/test/test.html --browsers firefox",
+    "testee": "testee test/test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
-    "jshint": "jshint src/. --config",
+    "jshint": "jshint src/. test/. --config",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
@@ -47,9 +47,6 @@
   ],
   "system": {
     "main": "can-legacy-view-helpers",
-    "directories": {
-      "lib": "src/"
-    },
     "configDependencies": [
       "live-reload"
     ],
@@ -62,16 +59,20 @@
     ]
   },
   "dependencies": {
-    "can": "canjs/canjs#major",
-    "jquery": "~2.2.1"
+    "can-compute": "^3.0.0-pre.19",
+    "can-event": "^3.0.0-pre.17",
+    "can-util": "^3.0.0-pre.68",
+    "can-view-callbacks": "^3.0.0-pre.9",
+    "can-view-live": "^3.0.0-pre.5",
+    "can-view-parser": "^3.0.0-pre.7"
   },
   "devDependencies": {
     "documentjs": "^0.4.2",
     "jshint": "^2.9.1",
     "cssify": "^0.6.0",
-    "steal": "^0.14.0",
+    "steal": "^0.16.0",
     "steal-qunit": "^0.1.1",
-    "steal-tools": "^0.14.0",
+    "steal-tools": "^0.16.0",
     "testee": "^0.2.4",
     "generator-donejs": "^0.7.0",
     "donejs-cli": "^0.7.0"
