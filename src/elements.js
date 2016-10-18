@@ -1,4 +1,5 @@
 var can = require('can-util');
+var view = require('./view');
 var $ = require('jquery');
 
 var doc = typeof document !== "undefined" ? document: null;
@@ -8,8 +9,8 @@ var selectsCommentNodes = doc && (function(){
 })();
 
 /**
- * @property {Object} can.view.elements
- * @parent can.view
+ * @property {Object} view.elements
+ * @parent view
  *
  * Provides helper methods for and information about the behavior
  * of DOM elements.
@@ -20,8 +21,8 @@ var elements = {
 		textarea: 'value'
 	},
 	/**
-	 * @property {Object.<String,(String|Boolean|function)>} can.view.elements.attrMap
-	 * @parent can.view.elements
+	 * @property {Object.<String,(String|Boolean|function)>} view.elements.attrMap
+	 * @parent view.elements
 	 *
 	 *
 	 * A mapping of
@@ -47,8 +48,8 @@ var elements = {
 	defaultValue: can.attr.defaultValue,
 	// a map of parent element to child elements
 	/**
-	 * @property {Object.<String,String>} can.view.elements.tagMap
-	 * @parent can.view.elements
+	 * @property {Object.<String,String>} view.elements.tagMap
+	 * @parent view.elements
 	 *
 	 * A mapping of parent node names to child node names that can be inserted within
 	 * the parent node name.  For example: `table: "tbody"` means that
@@ -104,8 +105,8 @@ var elements = {
 		return '' + text;
 	},
 	/**
-	 * @function can.view.elements.after
-	 * @parent can.view.elements
+	 * @function view.elements.after
+	 * @parent view.elements
 	 *
 	 * Inserts newFrag after oldElements.
 	 *
@@ -122,8 +123,8 @@ var elements = {
 		}
 	},
 	/**
-	 * @function can.view.elements.replace
-	 * @parent can.view.elements
+	 * @function view.elements.replace
+	 * @parent view.elements
 	 *
 	 * Replaces `oldElements` with `newFrag`
 	 *
@@ -156,6 +157,6 @@ var elements = {
 	}
 };
 
-can.view.elements = elements;
+view.elements = elements;
 
 module.exports = elements;

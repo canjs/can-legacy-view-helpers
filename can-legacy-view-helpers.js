@@ -1,2 +1,4 @@
-export { default as can } from "./src/render.js";
-export { default as Scanner } from "./src/scanner.js";
+module.exports = {
+	view: require("./src/render.js"),
+	Scanner: require("./src/scanner.js"),
+};

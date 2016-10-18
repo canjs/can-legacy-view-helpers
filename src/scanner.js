@@ -79,8 +79,7 @@ var newLine = /(\r|\n)+/g,
 	// returns the top of a stack
 	_top = function (stack) {
 		return stack[stack.length - 1];
-	},
-	Scanner;
+	};
 
 /**
  * @constructor view.Scanner
@@ -95,7 +94,7 @@ var newLine = /(\r|\n)+/g,
  */
 //
 
-view.Scanner = Scanner = function (options) {
+var Scanner = function (options) {
 	// Set options on self
 	can.deepAssign(this, {
 		/**

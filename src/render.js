@@ -66,7 +66,7 @@ var pendingHookups = [],
 
 var lastHookups;
 
-can.deepAssign(view, {
+var render = {
 	live: live,
 	// called in text to make a temporary 
 	// view.lists function that can be called with
@@ -256,6 +256,8 @@ can.deepAssign(view, {
 			return live.attributePlaceholder;
 		}
 	}
-});
+};
 
-module.exports = can;
+can.deepAssign(view, render);
+
+module.exports = render;

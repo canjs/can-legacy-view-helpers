@@ -12,6 +12,22 @@ var isFunction = can.isFunction,
 	// Used for hookup `id`s.
 	hookupId = 1;
 
+// #### can.view
+//defines $view for internal use, can.template for backwards compatibility
+/**
+ * @add can.view
+ */
+var $view = function (view, data, helpers, callback) {
+	// If helpers is a `function`, it is actually a callback.
+	if (isFunction(helpers)) {
+		callback = helpers;
+		helpers = undefined;
+	}
+
+	// Render the view as a fragment
+	return $view.renderAs("fragment",view, data, helpers, callback);
+};
+
 // internal utility methods
 // ------------------------
 
@@ -184,22 +200,6 @@ var getDeferreds = function (data) {
  */
 var usefulPart = function (resolved) {
 	return can.isArray(resolved) && resolved[1] === 'success' ? resolved[0] : resolved;
-};
-
-// #### can.view
-//defines $view for internal use, can.template for backwards compatibility
-/**
- * @add can.view
- */
-var $view = can.view = can.template = function (view, data, helpers, callback) {
-	// If helpers is a `function`, it is actually a callback.
-	if (isFunction(helpers)) {
-		callback = helpers;
-		helpers = undefined;
-	}
-
-	// Render the view as a fragment
-	return $view.renderAs("fragment",view, data, helpers, callback);
 };
 
 // can.view methods
@@ -375,7 +375,7 @@ can.deepAssign($view, {
 
 		//!steal-remove-start
 		if ( typeof window !== "undefined" && window.steal && steal.type ) {
-			steal.type(info.suffix + " view js", function (options, success, error) {
+			steal.type(info.suffix + " view js", function (options, success/*, error*/) {
 				var type = $view.types["." + options.type],
 					id = $view.toId(options.id + '');
 				options.text = type.script(id, options.text);
@@ -677,12 +677,12 @@ can.deepAssign($view, {
 				// In the future, we might simply store either a deferred or the cached result.
 				if (deferred.state() === 'resolved' && deferred.__view_id) {
 					var currentRenderer = $view.cachedRenderers[deferred.__view_id];
-					return data ? can.view.renderTo(format, currentRenderer, data, helpers, nodelist) : currentRenderer;
+					return data ? $view.renderTo(format, currentRenderer, data, helpers, nodelist) : currentRenderer;
 				} else {
 					// Otherwise, the deferred is complete, so
 					// set response to the result of the rendering.
 					deferred.then(function (renderer) {
-						response = data ? can.view.renderTo(format, renderer, data, helpers, nodelist) : renderer;
+						response = data ? $view.renderTo(format, renderer, data, helpers, nodelist) : renderer;
 					});
 				}
 			}
@@ -748,7 +748,7 @@ can.deepAssign($view, {
 if ( typeof window !== "undefined" && window.steal && steal.type) {
 	//when being used as a steal module, add a new type for 'view' that runs
 	// `can.view.preloadStringRenderer` with the loaded string/text for the dependency.
-	steal.type("view js", function (options, success, error) {
+	steal.type("view js", function (options, success/*, error*/) {
 		var type = $view.types["." + options.type],
 			id = $view.toId(options.id);
 		/**
