@@ -56,7 +56,7 @@ var pendingHookups = [],
 	// Returns escaped/sanatized content for anything other than a live-binding
 	contentEscape = function (txt, tag) {
 		return (typeof txt === 'string' || typeof txt === 'number') ?
-			can.esc(txt) :
+			can.string.esc(txt) :
 			contentText(txt, tag);
 	},
 	// A flag to indicate if .txt was called within a live section within an element like the {{name}}
@@ -66,7 +66,7 @@ var pendingHookups = [],
 
 var lastHookups;
 
-var render = {
+var render = can.deepAssign(view, {
 	live: live,
 	// called in text to make a temporary 
 	// view.lists function that can be called with
@@ -256,8 +256,6 @@ var render = {
 			return live.attributePlaceholder;
 		}
 	}
-};
-
-can.deepAssign(view, render);
+});
 
 module.exports = render;

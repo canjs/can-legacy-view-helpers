@@ -1,8 +1,8 @@
 // # can/view/view.js
 // -------
-// `can.view`
+// `$view`
 // _Templating abstraction._
-// can.view loads templates based on a registered type, and given a set of data, returns a document fragment
+// $view loads templates based on a registered type, and given a set of data, returns a document fragment
 // from the template engine's rendering method
 
 var can = require("can-util");
@@ -12,10 +12,10 @@ var isFunction = can.isFunction,
 	// Used for hookup `id`s.
 	hookupId = 1;
 
-// #### can.view
+// #### $view
 //defines $view for internal use, can.template for backwards compatibility
 /**
- * @add can.view
+ * @add $view
  */
 var $view = function (view, data, helpers, callback) {
 	// If helpers is a `function`, it is actually a callback.
@@ -59,7 +59,7 @@ var checkText = function (text, url) {
 		can.dev.log("can/view/view.js: There is no template or an empty template at " + url);
 		//!steal-remove-end
 
-		throw new Error("can.view: No template or empty template:" + url);
+		throw new Error("$view: No template or empty template:" + url);
 	}
 };
 
@@ -202,14 +202,14 @@ var usefulPart = function (resolved) {
 	return can.isArray(resolved) && resolved[1] === 'success' ? resolved[0] : resolved;
 };
 
-// can.view methods
+// $view methods
 // --------------------------
 can.deepAssign($view, {
 	// ##### frag
 	// creates a fragment and hooks it up all at once
 	/**
-	 * @function can.view.frag frag
-	 * @parent can.view.static
+	 * @function $view.frag frag
+	 * @parent $view.static
 	 */
 	frag: function (result, parentNode) {
 		return $view.hookup($view.fragment(result), parentNode);
@@ -286,9 +286,9 @@ can.deepAssign($view, {
 	// only implemented by EJS templates.
 	/**
 	 * @description Create a hookup to insert into templates.
-	 * @function can.view.hook hook
-	 * @parent can.view.static
-	 * @signature `can.view.hook(callback)`
+	 * @function $view.hook hook
+	 * @parent $view.static
+	 * @signature `$view.hook(callback)`
 	 * @param {Function} callback A callback function to be called with the element.
 	 *
 	 * @body
@@ -296,7 +296,7 @@ can.deepAssign($view, {
 	 * put on the page.  Typically this is handled by the template engine.  Currently
 	 * only EJS supports this functionality.
 	 *
-	 *     var id = can.view.hook(function(el){
+	 *     var id = $view.hook(function(el){
 	 *            //do something with el
 	 *         }),
 	 *         html = "<div data-view-id='"+id+"'>"
@@ -309,8 +309,8 @@ can.deepAssign($view, {
 
 	/**
 	 * @hide
-	 * @property {Object} can.view.cached view
-	 * @parent can.view
+	 * @property {Object} $view.cached view
+	 * @parent $view
 	 * Cached are put in this object
 	 */
 	cached: {},
@@ -318,13 +318,13 @@ can.deepAssign($view, {
 
 	// cache view templates resolved via XHR on the client
 	/**
-	 * @property {Boolean} can.view.cache cache
-	 * @parent can.view.static
+	 * @property {Boolean} $view.cache cache
+	 * @parent $view.static
 	 * By default, views are cached on the client.  If you'd like the
 	 * the views to reload from the server, you can set the `cache` attribute to `false`.
 	 *
 	 *	//- Forces loads from server
-	 *	can.view.cache = false;
+	 *	$view.cache = false;
 	 *
 	 */
 	cache: true,
@@ -333,10 +333,10 @@ can.deepAssign($view, {
 	// given an info object, register a template type
 	// different templating solutions produce strings or document fragments via their renderer function
 	/**
-	 * @function can.view.register register
-	 * @parent can.view.static
+	 * @function $view.register register
+	 * @parent $view.static
 	 * @description Register a templating language.
-	 * @signature `can.view.register(info)`
+	 * @signature `$view.register(info)`
 	 * @param {{}} info Information about the templating language.
 	 * @option {String} plugin The location of the templating language's plugin.
 	 * @option {String} suffix Files with this suffix will use this templating language's plugin by default.
@@ -351,7 +351,7 @@ can.deepAssign($view, {
 	 * ## Example
 	 *
 	 * ```
-	 * can.View.register({
+	 * $view.register({
 	 *	suffix : "tmpl",
 	 *  plugin : "jquery/view/tmpl",
 	 *	renderer: function( id, text ) {
@@ -430,13 +430,13 @@ can.deepAssign($view, {
 	types: {},
 
 	/**
-	 * @property {String} can.view.ext ext
-	 * @parent can.view.static
+	 * @property {String} $view.ext ext
+	 * @parent $view.static
 	 * The default suffix to use if none is provided in the view's url.
 	 * This is set to `.ejs` by default.
 	 *
 	 *	// Changes view ext to 'txt'
-	 *	can.view.ext = 'txt';
+	 *	$view.ext = 'txt';
 	 *
 	 */
 	ext: ".ejs",
@@ -449,7 +449,7 @@ can.deepAssign($view, {
 	 * @param {Object} src
 	 */
 	registerScript: function (type, id, src) {
-		return 'can.view.preloadStringRenderer(\'' + id + '\',' + $view.types['.' + type].script(id, src) + ');';
+		return '$view.preloadStringRenderer(\'' + id + '\',' + $view.types['.' + type].script(id, src) + ');';
 	},
 
 	/**
@@ -486,9 +486,9 @@ can.deepAssign($view, {
 
 	// #### renderers
 	// ---------------
-	// can.view's primary purpose is to load templates (from strings or filesystem) and render them
+	// $view's primary purpose is to load templates (from strings or filesystem) and render them
 	//
-	// can.view supports two different forms of rendering systems
+	// $view supports two different forms of rendering systems
 	//
 	// mustache templates return a string based rendering function
 
@@ -497,16 +497,16 @@ can.deepAssign($view, {
 	// ##### render
 	//
 	/**
-	 * @function can.view.render render
-	 * @parent can.view.static
+	 * @function $view.render render
+	 * @parent $view.static
 	 * @description Render a template.
-	 * @signature `can.view.render(template[, callback])`
+	 * @signature `$view.render(template[, callback])`
 	 * @param {String|Object} view The path of the view template or a view object.
 	 * @param {Function} [callback] A function executed after the template has been processed.
 	 * @return {Function|can.Deferred} A renderer function to be called with data and helpers
 	 * or a Deferred that resolves to a renderer function.
 	 *
-	 * @signature `can.view.render(template, data[, [helpers,] callback])`
+	 * @signature `$view.render(template, data[, [helpers,] callback])`
 	 * @param {String|Object} view The path of the view template or a view object.
 	 * @param {Object} [data] The data to populate the template with.
 	 * @param {Object.<String, function>} [helpers] Helper methods referenced in the template.
@@ -516,11 +516,11 @@ can.deepAssign($view, {
 	 * or a Deferred that resolves to the template with interpolated data.
 	 *
 	 * @body
-	 * `can.view.render(view, [data], [helpers], callback)` returns the rendered markup produced by the corresponding template
+	 * `$view.render(view, [data], [helpers], callback)` returns the rendered markup produced by the corresponding template
 	 * engine as String. If you pass a deferred object in as data, render returns
 	 * a deferred resolving to the rendered markup.
 	 *
-	 * `can.view.render` is commonly used for sub-templates.
+	 * `$view.render` is commonly used for sub-templates.
 	 *
 	 * ## Example
 	 *
@@ -530,7 +530,7 @@ can.deepAssign($view, {
 	 *
 	 * Render it to a string like:
 	 *
-	 *     can.view.render("welcome.ejs",{hello: "world"})
+	 *     $view.render("welcome.ejs",{hello: "world"})
 	 *       //-> <h1>Hello world</h1>
 	 *
 	 * ## Use as a Subtemplate
@@ -539,16 +539,16 @@ can.deepAssign($view, {
 	 *
 	 *     <ul>
 	 *       <% list(items, function(item){ %>
-	 *         <%== can.view.render("item.ejs",item) %>
+	 *         <%== $view.render("item.ejs",item) %>
 	 *       <% }) %>
 	 *     </ul>
 	 *
 	 * ## Using renderer functions
 	 *
-	 * If you only pass the view path, `can.view will return a renderer function that can be called with
+	 * If you only pass the view path, `$view will return a renderer function that can be called with
 	 * the data to render:
 	 *
-	 *     var renderer = can.view.render("welcome.ejs");
+	 *     var renderer = $view.render("welcome.ejs");
 	 *     // Do some more things
 	 *     renderer({hello: "world"}) // -> Document Fragment
 	 *
@@ -556,7 +556,7 @@ can.deepAssign($view, {
 	//call `renderAs` with a hardcoded string, as view.render
 	// always operates against resolved template files or hardcoded strings
 	render: function (view, data, helpers, callback, nodelist) {
-		return can.view.renderAs("string",view, data, helpers, callback, nodelist);
+		return $view.renderAs("string",view, data, helpers, callback, nodelist);
 	},
 
 	// ##### renderTo
@@ -634,7 +634,7 @@ can.deepAssign($view, {
 					}
 
 					// Get the rendered result.
-					result = can.view.renderTo(format, renderer, dataCopy, helpers, nodelist);
+					result = $view.renderTo(format, renderer, dataCopy, helpers, nodelist);
 
 					// Resolve with the rendered view.
 					deferred.resolve(result, dataCopy);
@@ -663,7 +663,7 @@ can.deepAssign($view, {
 				response = deferred;
 				// And fire callback with the rendered result.
 				deferred.then(function (renderer) {
-					callback(data ? can.view.renderTo(format, renderer, data, helpers, nodelist) : renderer);
+					callback(data ? $view.renderTo(format, renderer, data, helpers, nodelist) : renderer);
 				});
 			} else {
 				// if the deferred is resolved, call the cached renderer instead
@@ -747,19 +747,19 @@ can.deepAssign($view, {
 //!steal-remove-start
 if ( typeof window !== "undefined" && window.steal && steal.type) {
 	//when being used as a steal module, add a new type for 'view' that runs
-	// `can.view.preloadStringRenderer` with the loaded string/text for the dependency.
+	// `$view.preloadStringRenderer` with the loaded string/text for the dependency.
 	steal.type("view js", function (options, success/*, error*/) {
 		var type = $view.types["." + options.type],
 			id = $view.toId(options.id);
 		/**
 		 * @hide
 		 * should return something like steal("dependencies",function(EJS){
-		 * return can.view.preload("ID", options.text)
+		 * return $view.preload("ID", options.text)
 		 * })
 		 */
 		var dependency = type.plugin || 'can/view/' + options.type,
 			preload = type.fragRenderer ? "preload" : "preloadStringRenderer";
-		options.text = 'steal(\'can/view\',\'' + dependency + '\',function(can){return ' + 'can.view.'+preload+'(\'' + id + '\',' + options.text + ');\n})';
+		options.text = 'steal(\'can/view\',\'' + dependency + '\',function(can){return ' + '$view.'+preload+'(\'' + id + '\',' + options.text + ');\n})';
 		success();
 	});
 }
