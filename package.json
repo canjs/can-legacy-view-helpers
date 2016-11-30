@@ -28,7 +28,7 @@
     "document": "documentjs",
     "develop": "can-serve --static --develop --port 8080"
   },
-  "main": "dist/cjs/can-legacy-view-helpers",
+  "main": "can-legacy-view-helpers",
   "browser": {
     "transform": [
       "cssify"
