@@ -47,12 +47,13 @@
     ]
   },
   "dependencies": {
-    "can-compute": "^3.0.0-pre.19",
-    "can-event": "^3.0.0-pre.17",
-    "can-util": "^3.0.0-pre.68",
-    "can-view-callbacks": "^3.0.0-pre.9",
-    "can-view-live": "^3.0.0-pre.5",
-    "can-view-parser": "^3.0.0-pre.7"
+    "can-cid": "^1.0.0",
+    "can-compute": "^3.0.4",
+    "can-event": "^3.0.1",
+    "can-util": "^3.1.1",
+    "can-view-callbacks": "^3.0.3",
+    "can-view-live": "^3.0.4",
+    "can-view-parser": "^3.0.2"
   },
   "devDependencies": {
     "documentjs": "^0.4.2",

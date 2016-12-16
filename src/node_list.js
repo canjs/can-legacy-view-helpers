@@ -1,5 +1,5 @@
 var makeArray = require("can-util/js/make-array/make-array");
-var CID = require("can-util/js/cid/cid");
+var CID = require("can-cid");
 var each = require("can-util/js/each/each");
 var domMutate = require("can-util/dom/mutate/mutate");
 	// ## Helpers
