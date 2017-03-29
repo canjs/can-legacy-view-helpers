@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "can-cid": "^1.0.0",
-    "can-compute": "^3.0.4",
+    "can-compute": "3.0.7",
     "can-event": "^3.0.1",
     "can-util": "^3.1.1",
     "can-view-callbacks": "^3.0.3",
