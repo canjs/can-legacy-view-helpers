@@ -25,7 +25,6 @@
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
-    "document": "documentjs",
     "develop": "can-serve --static --develop --port 8080"
   },
   "main": "can-legacy-view-helpers",
