@@ -1,5 +1,7 @@
 #can-legacy-view-helpers
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-legacy-view-helpers.svg)](https://greenkeeper.io/)
+
 The files in this repository are used by legacy view engines for CanJS, specifically [can-ejs](https://github.com/canjs/can-ejs) and [can-mustache](https://github.com/canjs/can-mustache). This module is not intended to be used as a standalone module. While the code in this repository has been heavily tested and should be considered stable, it is no longer supported. Please use at your own risk.
 
 CanJS now ships with [Stache](https://canjs.com/docs/can.stache.html) as its primary view engine - it is much faster than mustache and ejs. You should use it instead!readm
