@@ -14,7 +14,8 @@ var legacyHelpers = {
 	nodeLists: nodeLists
 };
 
-window.CAN_LEGACY_HELPERS = legacyHelpers;
-
+if(typeof window !== "undefined"){
+    window.CAN_LEGACY_HELPERS = legacyHelpers;
+}
 
 module.exports = legacyHelpers;
