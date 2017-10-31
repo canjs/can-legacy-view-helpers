@@ -1,6 +1,7 @@
 /**
  * This module must be CJS format because is uses `with () { ... }`
  * statements which will not work in ES6 since it forces strict mode.
+ * @hide
  */
 
 var elements = require("./elements");
@@ -10,6 +11,7 @@ var view = require("./view");
 var each = require("can-util/js/each/each");
 /**
  * Helper(s)
+ * @hide
  */
 var newLine = /(\r|\n)+/g,
 	notEndTag = /\//,
@@ -84,6 +86,7 @@ var newLine = /(\r|\n)+/g,
 
 /**
  * @constructor can.view.Scanner
+ * @hide
  *
  * can.view.Scanner is used to convert a template into a JavaScript function.  That
  * function is called to produce a rendered result as a string. Often
@@ -100,6 +103,7 @@ var Scanner = function (options) {
 	deepAssign(this, {
 		/**
 		 * @typedef {{start: String, escape: String, scope: String, options: String}}  can.view.Scanner.text
+		 * @hide
 		 */
 		text: {},
 		tokens: []
@@ -159,6 +163,7 @@ var Scanner = function (options) {
 
 /**
  * Extend can.View to add scanner support.
+ * @hide
  */
 Scanner.prototype = {
 	// a default that can be overwritten

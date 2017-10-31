@@ -6,6 +6,7 @@ var canCompute = require("can-compute");
 var live = require("./live");
 /**
  * Helper(s)
+ * @hide
  */
 var pendingHookups = [],
 	tagChildren = function (tagName) {

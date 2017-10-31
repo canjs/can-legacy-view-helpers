@@ -7,6 +7,7 @@ var doc = typeof document !== "undefined" ? document: null;
 /**
  * @property {Object} can.view.elements
  * @parent can.view
+ * @hide
  *
  * Provides helper methods for and information about the behavior
  * of DOM elements.
@@ -19,6 +20,7 @@ var elements = {
 	/**
 	 * @property {Object.<String,(String|Boolean|function)>} can.view.elements.attrMap
 	 * @parent can.view.elements
+	 * @hide
 	 *
 	 *
 	 * A mapping of
@@ -39,6 +41,7 @@ var elements = {
 	/**
 	 * @property {Object.<String,String>} can.view.elements.tagMap
 	 * @parent can.view.elements
+	 * @hide
 	 *
 	 * A mapping of parent node names to child node names that can be inserted within
 	 * the parent node name.  For example: `table: "tbody"` means that

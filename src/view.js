@@ -43,6 +43,7 @@ deepAssign($view, {
 	/**
 	 * @function can.view.frag frag
 	 * @parent can.view.static
+	 * @hide
 	 */
 	frag: function (result, parentNode) {
 		return $view.hookup($view.fragment(result), parentNode);
@@ -122,6 +123,7 @@ deepAssign($view, {
 	 * @function can.view.hook hook
 	 * @parent can.view.static
 	 * @signature `can.view.hook(callback)`
+	 * @hide
 	 * @param {Function} callback A callback function to be called with the element.
 	 *
 	 * @body
