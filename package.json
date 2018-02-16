@@ -51,7 +51,7 @@
     "can-compute": "^3.1.0",
     "can-event": "^3.5.0",
     "can-util": "^3.9.0",
-    "can-view-callbacks": "^3.1.0",
+    "can-view-callbacks": "^4.0.1",
     "can-view-live": "^3.1.0",
     "can-view-parser": "^3.4.0"
   },
