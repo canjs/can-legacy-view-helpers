@@ -53,7 +53,7 @@
     "can-util": "^3.9.0",
     "can-view-callbacks": "^3.1.0",
     "can-view-live": "^3.1.0",
-    "can-view-parser": "^3.4.0"
+    "can-view-parser": "^4.1.1"
   },
   "devDependencies": {
     "detect-cyclic-packages": "^1.1.0",
