@@ -10,6 +10,7 @@
 The files in this repository are used by legacy view engines for CanJS, specifically [can-ejs](https://canjs.com/doc/can-ejs.html) and [can-mustache](https://github.com/canjs/can-mustache). This module is not intended to be used as a standalone module. While the code in this repository has been heavily tested and should be considered stable, it is no longer supported. Please use at your own risk.
 
 CanJS now ships with [Stache](https://canjs.com/docs/can.stache.html) as its primary view engine — it is much faster than mustache and ejs. You should use it instead!
+
 ## Documentation
 
 Read the [can-legacy-view-helpers API docs on CanJS.com](https://canjs.com/doc/can-legacy-view-helpers.html).
