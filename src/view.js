@@ -13,11 +13,18 @@ var isFunction = require("can-util/js/is-function/is-function"),
 	each = require("can-util/js/each/each"),
 	can = require("can-namespace"),
 	Observation = require("can-observation"),
+	ajax = require("can-ajax/can-ajax"),
+	Deferred = require("./deferred"),
 	// Used for hookup `id`s.
-	hookupId = 1;
+	hookupId = 1,
+	$view; // defined later
 
 // internal utility methods
 // ------------------------
+
+var isDeferred = function(maybeDeferred) {
+	return maybeDeferred instanceof Deferred;
+};
 
 var makeRenderer = function(textRenderer) {
 	if (textRenderer.renderType === "fragment") {
@@ -59,7 +66,7 @@ var checkText = function (text, url) {
 var	getRenderer = function (obj, async) {
 	// If `obj` already is a renderer function just resolve a Deferred with it
 	if(isFunction(obj)) {
-		var def = can.Deferred();
+		var def = Deferred();
 		return def.resolve(obj);
 	}
 
@@ -91,7 +98,7 @@ var	getRenderer = function (obj, async) {
 	}
 
 	// if the suffix was derived from the .match() operation, pluck out the first value
-	if (can.isArray(suffix)) {
+	if (Array.isArray(suffix)) {
 		suffix = suffix[0];
 	}
 
@@ -129,8 +136,8 @@ var	getRenderer = function (obj, async) {
 		return $view.registerView(id, el.innerHTML, type);
 	} else {
 		// Make an ajax request for text.
-		var d = new can.Deferred();
-		jQuery.ajax({
+		var d = new Deferred();
+		ajax({
 			async: async,
 			url: url,
 			dataType: 'text',
@@ -159,11 +166,11 @@ var getDeferreds = function (data) {
 	var deferreds = [];
 
 	// pull out deferreds
-	if (can.isPromise(data)) {
+	if (isDeferred(data)) {
 		return [data];
 	} else {
 		for (var prop in data) {
-			if (can.isPromise(data[prop])) {
+			if (isDeferred(data[prop])) {
 				deferreds.push(data[prop]);
 			}
 		}
@@ -183,7 +190,7 @@ var getDeferreds = function (data) {
  * @return {*}
  */
 var usefulPart = function (resolved) {
-	return can.isArray(resolved) && resolved[1] === 'success' ? resolved[0] : resolved;
+	return Array.isArray(resolved) && resolved[1] === 'success' ? resolved[0] : resolved;
 };
 
 // #### can.view
@@ -191,7 +198,7 @@ var usefulPart = function (resolved) {
 /**
  * @add can.view
  */
-var $view = function (view, data, helpers, callback) {
+$view = function (view, data, helpers, callback) {
 	// If helpers is a `function`, it is actually a callback.
 	if (isFunction(helpers)) {
 		callback = helpers;
@@ -202,6 +209,9 @@ var $view = function (view, data, helpers, callback) {
 	return $view.renderAs("fragment",view, data, helpers, callback);
 };
 
+if (can.view) {
+	Object.assign($view, can.view);
+}
 // can.view methods
 // --------------------------
 deepAssign($view, {
@@ -218,7 +228,7 @@ deepAssign($view, {
 	// #### fragment
 	// this is used internally to create a document fragment, insert it,then hook it up
 	fragment: function (result) {
-		return can.frag(result, document);
+		return canFrag(result, document);
 	},
 
 	// ##### toId
@@ -254,15 +264,15 @@ deepAssign($view, {
 			func;
 
 		// Get all `childNodes`.
-		can.each(fragment.childNodes ? can.makeArray(fragment.childNodes) : fragment, function (node) {
+		each(fragment.childNodes ? makeArray(fragment.childNodes) : fragment, function (node) {
 			if (node.nodeType === 1) {
 				hookupEls.push(node);
-				hookupEls.push.apply(hookupEls, can.makeArray(node.getElementsByTagName('*')));
+				hookupEls.push.apply(hookupEls, makeArray(node.getElementsByTagName('*')));
 			}
 		});
 
 		// Filter by `data-view-id` attribute.
-		can.each(hookupEls, function (el) {
+		each(hookupEls, function (el) {
 			if (el.getAttribute && (id = el.getAttribute('data-view-id')) && (func = $view.hookups[id])) {
 				func(el, parentNode, id);
 				delete $view.hookups[id];
@@ -375,7 +385,7 @@ deepAssign($view, {
 
 		//!steal-remove-start
 		if ( typeof window !== "undefined" && window.steal && steal.type ) {
-			steal.type(info.suffix + " view js", function (options, success, error) {
+			steal.type(info.suffix + " view js", function (options, success) {
 				var type = $view.types["." + options.type],
 					id = $view.toId(options.id + '');
 				options.text = type.script(id, options.text);
@@ -460,7 +470,7 @@ deepAssign($view, {
 	 * @param {Function} renderer
 	 */
 	preload: function (id, renderer) {
-		var def = $view.cached[id] = new can.Deferred()
+		var def = $view.cached[id] = Deferred()
 			.resolve(function (data, helpers) {
 				return renderer.call(data, data, helpers);
 			});
@@ -556,7 +566,7 @@ deepAssign($view, {
 	//call `renderAs` with a hardcoded string, as view.render
 	// always operates against resolved template files or hardcoded strings
 	render: function (view, data, helpers, callback, nodelist) {
-		return can.view.renderAs("string",view, data, helpers, callback, nodelist);
+		return $view.renderAs("string",view, data, helpers, callback, nodelist);
 	},
 
 	// ##### renderTo
@@ -613,13 +623,13 @@ deepAssign($view, {
 		if (deferreds.length) {
 			// Does data contain any deferreds?
 			// The deferred that resolves into the rendered content...
-			deferred = new can.Deferred();
-			dataCopy = can.extend({}, data);
+			deferred = new Deferred();
+			dataCopy = Object.assign({}, data);
 
 			// Add the view request to the list of deferreds.
 			deferreds.push(getRenderer(view, true));
 			// Wait for the view and all deferreds to finish...
-			can.when.apply(can, deferreds)
+			Deferred.when.apply(can, deferreds)
 				.then(function (resolved) {
 					// Get all the resolved deferreds.
 					var objs = makeArray(arguments),
@@ -629,13 +639,13 @@ deepAssign($view, {
 						result;
 
 					// Make data look like the resolved deferreds.
-					if (can.isPromise(data)) {
+					if (isDeferred(data)) {
 						dataCopy = usefulPart(resolved);
 					} else {
 						// Go through each prop in data again and
 						// replace the defferreds with what they resolved to.
 						for (var prop in data) {
-							if (can.isPromise(data[prop])) {
+							if (isDeferred(data[prop])) {
 								dataCopy[prop] = usefulPart(objs.shift());
 							}
 						}
@@ -671,7 +681,7 @@ deepAssign($view, {
 				response = deferred;
 				// And fire callback with the rendered result.
 				deferred.then(function (renderer) {
-					callback(data ? can.view.renderTo(format, renderer, data, helpers, nodelist) : renderer);
+					callback(data ? $view.renderTo(format, renderer, data, helpers, nodelist) : renderer);
 				});
 			} else {
 				// if the deferred is resolved, call the cached renderer instead
@@ -685,13 +695,13 @@ deepAssign($view, {
 				// In the future, we might simply store either a deferred or the cached result.
 				if (deferred.state() === 'resolved' && deferred.__view_id) {
 					var currentRenderer = $view.cachedRenderers[deferred.__view_id];
-					var result =  data ? can.view.renderTo(format, currentRenderer, data, helpers, nodelist) : currentRenderer;
+					var result =  data ? $view.renderTo(format, currentRenderer, data, helpers, nodelist) : currentRenderer;
 					return result;
 				} else {
 					// Otherwise, the deferred is complete, so
 					// set response to the result of the rendering.
 					deferred.then(function (renderer) {
-						response = data ? can.view.renderTo(format, renderer, data, helpers, nodelist) : renderer;
+						response = data ? $view.renderTo(format, renderer, data, helpers, nodelist) : renderer;
 					});
 				}
 			}
@@ -719,7 +729,7 @@ deepAssign($view, {
 			renderer = makeRenderer( info.renderer(id, text) );
 		}
 
-		def = def || new can.Deferred();
+		def = def || new Deferred();
 
 		// Cache if we are caching.
 		if ($view.cache) {
@@ -738,7 +748,7 @@ deepAssign($view, {
 		return function() {
 			var realArgs = [];
 			var fnArgs = arguments;
-			can.each(fnArgs, function(val, i) {
+			each(fnArgs, function(val, i) {
 				if (i <= fnArgs.length) {
 					while (val && val.isComputed) {
 						val = val();
@@ -751,22 +761,5 @@ deepAssign($view, {
 	}
 });
 
-$view.register({
-	suffix: 'ejs',
-	script: function (id, src) {
-		return 'can.EJS(function(_CONTEXT,_VIEW) { ' + new EJS({
-			text: src,
-			name: id
-		})
-			.template.out + ' })';
-	},
-	renderer: function (id, text) {
-		return can.EJS({
-			text: text,
-			name: id
-		});
-	}
-});
-
-module.exports = $view;
+module.exports = can.view = $view;
 
