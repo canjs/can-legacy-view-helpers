@@ -15,6 +15,7 @@ var isFunction = require("can-util/js/is-function/is-function"),
 	Observation = require("can-observation"),
 	ajax = require("can-ajax/can-ajax"),
 	Deferred = require("./deferred"),
+	dev = require("can-log/dev/dev"),
 	// Used for hookup `id`s.
 	hookupId = 1,
 	$view; // defined later
@@ -47,7 +48,7 @@ var checkText = function (text, url) {
 		// _removed if not used as a steal module_
 
 		//!steal-remove-start
-		can.dev.log("can/view/view.js: There is no template or an empty template at " + url);
+		dev.log("can/view/view.js: There is no template or an empty template at " + url);
 		//!steal-remove-end
 
 		throw new Error("can.view: No template or empty template:" + url);
@@ -616,6 +617,9 @@ deepAssign($view, {
 			callback = helpers;
 			helpers = undefined;
 		}
+
+		// give templates the can namespace:
+		helpers = Object.assign({ can: can }, helpers);
 
 		// See if we got passed any deferreds.
 		var deferreds = getDeferreds(data);
