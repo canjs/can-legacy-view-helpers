@@ -44,12 +44,25 @@
       "generator-donejs",
       "donejs-cli",
       "steal-tools"
-    ]
+    ],
+    "map": {
+      "can-legacy-view-helpers/deferred": "can-legacy-view-helpers/src/deferred",
+      "can-legacy-view-helpers/elements": "can-legacy-view-helpers/src/elements",
+      "can-legacy-view-helpers/live": "can-legacy-view-helpers/src/live",
+      "can-legacy-view-helpers/node_list": "can-legacy-view-helpers/src/node_list",
+      "can-legacy-view-helpers/render": "can-legacy-view-helpers/src/render",
+      "can-legacy-view-helpers/scanner": "can-legacy-view-helpers/src/scanner",
+      "can-legacy-view-helpers/view": "can-legacy-view-helpers/src/view"
+    }
   },
   "dependencies": {
+    "can-ajax": "^1.4.0",
     "can-cid": "^1.0.3",
     "can-compute": "^3.1.0",
     "can-event": "^3.5.0",
+    "can-log": "^1.0.0",
+    "can-namespace": "^1.0.0",
+    "can-observation": "^3.3.5",
     "can-util": "^3.9.0",
     "can-view-callbacks": "^3.1.0",
     "can-view-live": "^3.1.0",
@@ -57,7 +70,7 @@
   },
   "devDependencies": {
     "detect-cyclic-packages": "^1.1.0",
-    "documentjs": "^0.5.0",
+    "documentjs": "^0.5.5",
     "donejs-cli": "^1.0.1",
     "generator-donejs": "^1.0.5",
     "jshint": "^2.9.1",
