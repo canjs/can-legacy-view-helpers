@@ -5,10 +5,10 @@ var legacyViewHelpers = require("can-legacy-view-helpers");
 QUnit.module('can-legacy-view-helpers');
 
 QUnit.test('Exports things', function () {
-  QUnit.ok(legacyViewHelpers.view, "view");
-  QUnit.ok(legacyViewHelpers.elements, "elements");
-  QUnit.ok(legacyViewHelpers.live, "live");
-  QUnit.ok(legacyViewHelpers.nodeLists, "nodeLists");
-  QUnit.ok(legacyViewHelpers.render, "render");
-  QUnit.ok(legacyViewHelpers.Scanner, "Scanner");
+  assert.ok(legacyViewHelpers.view, "view");
+  assert.ok(legacyViewHelpers.elements, "elements");
+  assert.ok(legacyViewHelpers.live, "live");
+  assert.ok(legacyViewHelpers.nodeLists, "nodeLists");
+  assert.ok(legacyViewHelpers.render, "render");
+  assert.ok(legacyViewHelpers.Scanner, "Scanner");
 });
