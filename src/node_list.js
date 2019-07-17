@@ -1,7 +1,8 @@
-var makeArray = require("can-util/js/make-array/make-array");
+var canReflect = require("can-reflect");
+var makeArray = canReflect.toArray;
 var CID = require("can-cid");
-var each = require("can-util/js/each/each");
-var domMutate = require("can-util/dom/mutate/mutate");
+var each = canReflect.each;
+var domMutate = require("can-dom-mutate/node");
 	// ## Helpers
 	// Some browsers don't allow expando properties on HTMLTextNodes
 	// so let's try to assign a custom property, an 'expando' property.

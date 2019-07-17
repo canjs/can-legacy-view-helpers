@@ -1,9 +1,20 @@
 var view = require("./view");
 var elements = require("./elements");
-var string = require("can-util/js/string/string");
-var deepAssign = require("can-util/js/deep-assign/deep-assign");
+var deepAssign = require("can-reflect").assignDeep;
 var canCompute = require("can-compute");
 var live = require("./live");
+
+function escape(content) {
+	var isInvalid = content === null || content === undefined || isNaN(content) && '' + content === 'NaN';
+	content = '' + (isInvalid ? '' : content);
+	return content
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&#34;')
+		.replace(/'/g, '&#39;');
+}
+
 /**
  * Helper(s)
  * @hide
@@ -57,13 +68,12 @@ var pendingHookups = [],
 	// Returns escaped/sanatized content for anything other than a live-binding
 	contentEscape = function (txt, tag) {
 		return (typeof txt === 'string' || typeof txt === 'number') ?
-			string.esc(txt) :
+			escape(txt) :
 			contentText(txt, tag);
 	},
 	// A flag to indicate if .txt was called within a live section within an element like the {{name}}
 	// within `<div {{#person}}{{name}}{{/person}}/>`.
-	withinTemplatedSectionWithinAnElement = false,
-	emptyHandler = function () {};
+	withinTemplatedSectionWithinAnElement = false;
 
 var lastHookups;
 
@@ -139,6 +149,7 @@ deepAssign(view, {
 			value,
 			listData,
 			compute,
+			emptyHandler = function () {},
 			unbind = emptyHandler,
 			attributeName;
 

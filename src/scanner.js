@@ -6,9 +6,10 @@
 
 var elements = require("./elements");
 var viewCallbacks = require("can-view-callbacks");
-var deepAssign = require("can-util/js/deep-assign/deep-assign");
+var canReflect = require("can-reflect");
+var deepAssign = canReflect.assignDeep;
 var view = require("./view");
-var each = require("can-util/js/each/each");
+var each = canReflect.each;
 /**
  * Helper(s)
  * @hide
@@ -107,7 +108,9 @@ var Scanner = function (options) {
 		 */
 		text: {},
 		tokens: []
-	}, options);
+	});
+	deepAssign(this, options);
+
 	// make sure it's an empty string if it's not
 	this.text.options = this.text.options || "";
 

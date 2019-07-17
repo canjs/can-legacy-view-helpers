@@ -1,19 +1,20 @@
 var elements = require('./elements');
 var nodeLists = require("./node_list");
 var parser = require("can-view-parser");
-var diff = require("can-util/js/diff/diff");
+var canReflect = require("can-reflect");
+var diff = require("can-diff");
 var view = require("./view");
-var domEvent = require("can-util/dom/events/events");
-var canFrag = require("can-util/dom/frag/frag");
-var makeArray = require("can-util/js/make-array/make-array");
-var each = require("can-util/js/each/each");
+var domEvent = require("can-dom-events");
+var canFrag = require("can-fragment");
+var makeArray = canReflect.toArray;
+var each = canReflect.each;
 var canCompute = require("can-compute");
-var domAttr = require("can-util/dom/attr/attr");
-var domData = require("can-util/dom/data/data");
-var domMutate = require("can-util/dom/mutate/mutate");
+var mutateNode = require("can-dom-mutate/node");
+var domMutateEvents = require("can-dom-mutate/events/events");
+var domData = require("can-dom-data");
 var canBatch = require("can-event/batch/batch");
 
-require("can-util/dom/events/removed/removed");
+domEvent.addEvent(domMutateEvents.removed);
 
 var newLine = /(\r|\n)+/g;
 var getValue = function (val) {
@@ -23,6 +24,33 @@ var getValue = function (val) {
 	// check if starts and ends with " or '
 	return regexp.test(val) ? val.substr(1, val.length - 2) : val;
 };
+
+function setAttribute(el, attr, val) {
+	switch(attr) {
+		case 'value':
+			if (el.tagName === 'TEXTAREA') {
+				return el.value = val;
+			} else {
+				return mutateNode.setAttribute.call(el, attr, val);
+			}
+			break;
+		case 'textContent':
+			return el[attr] = val;
+		default:
+			return mutateNode.setAttribute.call(el, attr, val);
+	}
+}
+
+function getAttribute(el, attr) {
+	switch(attr) {
+		case 'value':
+		case 'textContent':
+			return el[attr];
+		default:
+			return el.getAttribute(attr);
+	}
+}
+
 	// ## live.js
 	//
 	// The live module provides live binding for computes
@@ -47,7 +75,7 @@ var getValue = function (val) {
 				if (!tornDown) {
 					tornDown = true;
 					unbind(data);
-					domEvent.removeEventListener.call(el, 'removed', teardown);
+					domEvent.removeEventListener(el, 'removed', teardown);
 				}
 				return true;
 			};
@@ -56,7 +84,7 @@ var getValue = function (val) {
 				return parent ? false : teardown();
 			}
 		};
-		domEvent.addEventListener.call(el, 'removed', teardown);
+		domEvent.addEventListener(el, 'removed', teardown);
 		bind(data);
 		return data;
 	},
@@ -79,9 +107,9 @@ var getValue = function (val) {
 		// operate on a compute
 		listen = function (el, compute, change) {
 			return setup(el, function () {
-				compute.computeInstance.bind('change', change);
+				canReflect.onValue(compute, change);
 			}, function (data) {
-				compute.computeInstance.unbind('change', change);
+				canReflect.offValue(compute, change);
 				if (data.nodeList) {
 					nodeLists.unregister(data.nodeList);
 				}
@@ -238,7 +266,7 @@ var getValue = function (val) {
 					} else {
 						// Add elements before the next index's first element.
 						var el = nodeLists.first(masterNodeList[masterListIndex]);
-						domMutate.insertBefore.call(el.parentNode, frag, el);
+						mutateNode.insertBefore.call(el.parentNode, frag, el);
 					}
 					splice.apply(masterNodeList, [
 						masterListIndex,
@@ -465,7 +493,7 @@ var getValue = function (val) {
 		html: function (el, compute, parentNode, nodeList) {
 			var data, nodes, makeAndPut;
 			parentNode = elements.getParentNode(el, parentNode);
-			data = listen(parentNode, compute, function (ev, newVal) {
+			data = listen(parentNode, compute, function (newVal) {
 				// TODO: remove teardownCheck in 2.1
 				var attached = nodeLists.first(nodes).parentNode;
 				// update the nodes in the DOM with the new rendered value
@@ -531,7 +559,7 @@ var getValue = function (val) {
 				node;
 
 			// setup listening right away so we don't have to re-calculate value
-			var data = listen(parent, compute, function (ev, newVal) {
+			var data = listen(parent, compute, function (newVal) {
 				// Sometimes this is 'unknown' in IE and will throw an exception if it is
 
 				if (typeof node.nodeValue !== 'unknown') {
@@ -560,7 +588,7 @@ var getValue = function (val) {
 		setAttributes: function(el, newVal) {
 			var attrs = getAttributeParts(newVal);
 			for(var name in attrs) {
-				domAttr.set(el, name, attrs[name]);
+				setAttribute(el, name, attrs[name]);
 			}
 		},
 
@@ -574,16 +602,16 @@ var getValue = function (val) {
 					var newValue = newAttrs[name],
 						oldValue = oldAttrs[name];
 					if(newValue !== oldValue) {
-						domAttr.set(el, name, newValue);
+						setAttribute(el, name, newValue);
 					}
 					delete oldAttrs[name];
 				}
 				for( name in oldAttrs ) {
-					domAttr.remove(el, name);
+					mutateNode.removeAttribute.call(el, name);
 				}
 				oldAttrs = newAttrs;
 			};
-			listen(el, compute, function (ev, newVal) {
+			listen(el, compute, function (newVal) {
 				setAttrs(newVal);
 			});
 			// current value has been set
@@ -598,7 +626,7 @@ var getValue = function (val) {
 		attribute: function (el, attributeName, compute) {
 			var hook;
 			listen(el, compute, function () {
-				domAttr.set(el, attributeName, hook.render());
+				setAttribute(el, attributeName, hook.render());
 			});
 			var hooks;
 			// Get the list of hookups or create one for this element.
@@ -607,13 +635,13 @@ var getValue = function (val) {
 			// `render` - A `function` to render the value of the attribute.
 			// `funcs` - A list of hookup `function`s on that attribute.
 			// `batchNum` - The last event `batchNum`, used for performance.
-			hooks = domData.get.call(el, 'hooks');
+			hooks = domData.get(el, 'hooks');
 			if (!hooks) {
-				domData.set.call(el, 'hooks', hooks = {});
+				domData.set(el, 'hooks', hooks = {});
 			}
 			// Get the attribute value.
 			// Cast to String. String expected for rendering. Attr may return other types for some attributes.
-			var attr = String(domAttr.get(el, attributeName)),
+			var attr = String(getAttribute(el, attributeName)),
 				// Split the attribute value by the template.
 				// Only split out the first __!!__ so if we have multiple hookups in the same attribute,
 				// they will be put in the right spot on first render
@@ -646,17 +674,17 @@ var getValue = function (val) {
 			goodParts.splice(1, 0, compute());
 
 			// Set the attribute.
-			domAttr.set(el, attributeName, goodParts.join(''));
+			setAttribute(el, attributeName, goodParts.join(''));
 		},
 		specialAttribute: function (el, attributeName, compute) {
-			listen(el, compute, function (ev, newVal) {
-				domAttr.set(el, attributeName, getValue(newVal));
+			listen(el, compute, function (newVal) {
+				setAttribute(el, attributeName, getValue(newVal));
 			});
-			domAttr.set(el, attributeName, getValue(compute()));
+			setAttribute(el, attributeName, getValue(compute()));
 		},
 
 		simpleAttribute: function(el, attributeName, compute){
-			listen(el, compute, function (ev, newVal) {
+			listen(el, compute, function (newVal) {
 				elements.setAttr(el, attributeName, newVal);
 			});
 			elements.setAttr(el, attributeName, compute());

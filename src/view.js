@@ -6,11 +6,12 @@
 // from the template engine's rendering method
 
 
-var isFunction = require("can-util/js/is-function/is-function"),
-	makeArray =require("can-util/js/make-array/make-array"),
-	deepAssign = require("can-util/js/deep-assign/deep-assign"),
-	canFrag = require("can-util/dom/frag/frag"),
-	each = require("can-util/js/each/each"),
+var canReflect = require('can-reflect'),
+	isFunction = canReflect.isFunctionLike,
+	makeArray = canReflect.toArray,
+	deepAssign = canReflect.assignDeep,
+	canFrag = require("can-fragment"),
+	each = canReflect.each,
 	can = require("can-namespace"),
 	Observation = require("can-observation"),
 	ajax = require("can-ajax/can-ajax"),

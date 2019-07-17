@@ -5,9 +5,10 @@
 //  It allows resolution and callbacks in thread, contrasting with ES5 Promises which always schedule
 //  a microtask for each callback.
 
-var isFunction = require("can-util/js/is-function/is-function"),
-	makeArray = require("can-util/js/make-array/make-array"),
-	each = require("can-util/js/each/each");
+var canReflect = require('can-reflect'),
+	isFunction = canReflect.isFunctionLike,
+	makeArray = canReflect.toArray,
+	each = canReflect.each;
 
 // ====== LEGACY DEFERRED DEFINITION =======
 // _Lightweight, jQuery style deferreds._
