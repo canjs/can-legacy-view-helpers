@@ -4,7 +4,7 @@ var legacyViewHelpers = require("can-legacy-view-helpers");
 
 QUnit.module('can-legacy-view-helpers');
 
-QUnit.test('Exports things', function () {
+QUnit.test('Exports things', function (assert) {
   assert.ok(legacyViewHelpers.view, "view");
   assert.ok(legacyViewHelpers.elements, "elements");
   assert.ok(legacyViewHelpers.live, "live");
