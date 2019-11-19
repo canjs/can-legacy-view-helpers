@@ -72,7 +72,7 @@
     "detect-cyclic-packages": "^1.1.0",
     "documentjs": "^0.5.5",
     "donejs-cli": "^1.0.1",
-    "generator-donejs": "^1.0.5",
+    "generator-donejs": "^3.4.2",
     "jshint": "^2.9.1",
     "steal": "^1.5.2",
     "steal-qunit": "^2.0.0",
