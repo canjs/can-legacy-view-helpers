@@ -65,7 +65,7 @@
     "can-observation": "^3.3.5",
     "can-util": "^3.9.0",
     "can-view-callbacks": "^3.1.0",
-    "can-view-live": "^3.1.0",
+    "can-view-live": "^5.0.4",
     "can-view-parser": "^3.4.0"
   },
   "devDependencies": {
